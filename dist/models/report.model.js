@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Report = void 0;
-class Report {
+exports.ReportModel = void 0;
+class ReportModel {
 }
-exports.Report = Report;
+exports.ReportModel = ReportModel;
 //# sourceMappingURL=report.model.js.map
