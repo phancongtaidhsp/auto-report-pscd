@@ -9,6 +9,7 @@ import { CronJob } from 'cron';
 import puppeteer from 'puppeteer';
 import { UserModel } from 'src/models/user.model';
 import { AuthService } from '../auth/auth.service';
+import { UserEntity } from 'src/entities/user.entity';
 
 @Injectable()
 export class CronReportService implements OnModuleInit {
@@ -18,6 +19,8 @@ export class CronReportService implements OnModuleInit {
     private cronReportRepository: Repository<CronReportModel>,
     @InjectRepository(ReportEntity)
     private reportRepository: Repository<ReportModel>,
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
     private authService: AuthService,
   ) { }
 
@@ -29,32 +32,39 @@ export class CronReportService implements OnModuleInit {
       relations: ['report', 'report.user']
     }) as any
     for (const c of crons) {
+      console.log("wooo");
+      console.log(c);
+      
       let range = null
+      const { time_end } = c.report;
+      const [hour, minute] = time_end.split(":")
       if(c.type === CronType.WEEKLY) {
-        range = `0 22 * * ${c.dayofweek}`
+        range = `${minute} ${hour} * * ${c.dayofweek}`
       } else {
-        range = `0 22 * * *`
+        range = `${minute} ${hour} * * *`
       }
-      const job = new CronJob(
-        range,
-        () => {
-          console.log(`cron with id: ${c.id} is running`);
-          this.createCron(c.report.user, c.report)
-        },
-        null,
-        true,
-        "Asia/Singapore"
-      )
-      this.cronReportList.push({
-        id: c.id,
-        job
-      })
-      job.start()
+      console.log(range);
+      
+      // const job = new CronJob(
+      //   range,
+      //   () => {
+      //     console.log(`cron with id: ${c.id} is running`);
+      //     this.createReportPuppeteer(c.report.user, c.report)
+      //   },
+      //   null,
+      //   true,
+      //   "Asia/Singapore"
+      // )
+      // this.cronReportList.push({
+      //   id: c.id,
+      //   job
+      // })
+      // job.start()
     }
   }
 
-  async createCron (user: UserModel, report: ReportModel) {
-    const { project_name, times_start, working_time, time_end, job, status, note } = report
+  async createReportPuppeteer (user: UserModel, report: ReportModel) {
+    const { project_name, time_start, working_time, time_end, job, status, note } = report
     const browser = await puppeteer.launch({
       headless: true,
       ignoreHTTPSErrors: true,
@@ -92,7 +102,7 @@ export class CronReportService implements OnModuleInit {
   
     await page.waitForTimeout(800)
   
-    await page.type("#time_start", times_start, { delay: 30 })
+    await page.type("#time_start", time_start, { delay: 30 })
   
     await page.waitForTimeout(800)
   
@@ -134,6 +144,8 @@ export class CronReportService implements OnModuleInit {
 
 
   async createCronReport(userId: number, cronReport: CronReportModel, report: ReportModel) {
+    // await this.canCreateCronReport(userId);
+    // return;
     const reportCreated = await this.reportRepository.save({ ...report, user: userId })
     const cronReportCreated = await this.cronReportRepository.save({ ...cronReport, report: reportCreated.id })
     const cron = await this.cronReportRepository.findOne({
@@ -143,28 +155,50 @@ export class CronReportService implements OnModuleInit {
       },
       relations: ['report', 'report.user']
     }) as any
-
-    let range = null
-    if(cron.type === CronType.WEEKLY) {
-      range = `0 22 * * ${cron.dayofweek}`
-    } else {
-      range = `0 22 * * *`
+    console.log("thit");
+    
+    console.log(cron);
+    
+    if(cron) {
+      let range = null
+      const { time_end } = report;
+      const [hour, minute] = time_end.split(":")
+      if(cron.type === CronType.WEEKLY) {
+        range = `${minute} ${hour} * * ${cron.dayofweek}`
+      } else {
+        range = `${minute} ${hour} * * *`
+      }
+      console.log(range);
+      
+      const job = new CronJob(
+        range,
+        () => {
+          console.log(`cron with id: ${cron.id} is running`);
+          this.createReportPuppeteer(cron.report.user, cron.report)
+        },
+        null,
+        true,
+        "Asia/Singapore"
+      )
+      job.start()
+      this.cronReportList.push({
+        id: cron.id,
+        job
+      })
     }
-    const job = new CronJob(
-      range,
-      () => {
-        console.log(`cron with id: ${cron.id} is running`);
-        this.createCron(cron.report.user, cron.report)
+    
+  }
+
+  async canCreateCronReport(userId: number){
+    const userReport = await this.userRepository.find({
+      where: {
+        id: userId
       },
-      null,
-      true,
-      "Asia/Singapore"
-    )
-    job.start()
-    this.cronReportList.push({
-      id: cron.id,
-      job
+      relations: ['reports']
     })
+    console.log("cang");
+    
+    console.log(userReport);
   }
 
   async deactiveCronRepor(cronReportId: number) {

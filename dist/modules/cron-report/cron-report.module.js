@@ -15,6 +15,7 @@ const cron_report_entity_1 = require("../../entities/cron-report.entity");
 const report_entity_1 = require("../../entities/report.entity");
 const jwt_1 = require("@nestjs/jwt");
 const auth_module_1 = require("../auth/auth.module");
+const user_entity_1 = require("../../entities/user.entity");
 let CronReportModule = class CronReportModule {
 };
 CronReportModule = __decorate([
@@ -27,7 +28,7 @@ CronReportModule = __decorate([
                     signOptions: { expiresIn: '24h' },
                 })
             }),
-            typeorm_1.TypeOrmModule.forFeature([cron_report_entity_1.CronReportEntity, report_entity_1.ReportEntity]),
+            typeorm_1.TypeOrmModule.forFeature([cron_report_entity_1.CronReportEntity, report_entity_1.ReportEntity, user_entity_1.UserEntity]),
             auth_module_1.AuthModule
         ],
         providers: [cron_report_service_1.CronReportService],

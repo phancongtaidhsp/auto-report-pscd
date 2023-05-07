@@ -1,7 +1,7 @@
 export declare class ReportModel {
     id?: number;
     project_name: string;
-    times_start: string;
+    time_start: string;
     working_time: string;
     time_end: string;
     job: string;

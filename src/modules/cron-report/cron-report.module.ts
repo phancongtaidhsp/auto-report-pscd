@@ -6,6 +6,7 @@ import { CronReportEntity } from 'src/entities/cron-report.entity';
 import { ReportEntity } from 'src/entities/report.entity';
 import { JwtModule } from '@nestjs/jwt';
 import { AuthModule } from '../auth/auth.module';
+import { UserEntity } from 'src/entities/user.entity';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { AuthModule } from '../auth/auth.module';
         signOptions: { expiresIn: '24h' },
       })
     }),
-    TypeOrmModule.forFeature([CronReportEntity, ReportEntity]),
+    TypeOrmModule.forFeature([CronReportEntity, ReportEntity, UserEntity]),
     AuthModule
   ],
   providers: [CronReportService],

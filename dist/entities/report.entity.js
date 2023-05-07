@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ReportEntity = void 0;
 const typeorm_1 = require("typeorm");
+const cron_report_entity_1 = require("./cron-report.entity");
 const user_entity_1 = require("./user.entity");
 let ReportEntity = class ReportEntity {
 };
@@ -25,7 +26,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
-], ReportEntity.prototype, "times_start", void 0);
+], ReportEntity.prototype, "time_start", void 0);
 __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
@@ -50,6 +51,10 @@ __decorate([
     (0, typeorm_1.ManyToOne)(() => user_entity_1.UserEntity, (user) => user.id),
     __metadata("design:type", Number)
 ], ReportEntity.prototype, "user", void 0);
+__decorate([
+    (0, typeorm_1.OneToMany)(() => cron_report_entity_1.CronReportEntity, (user) => user.id),
+    __metadata("design:type", cron_report_entity_1.CronReportEntity)
+], ReportEntity.prototype, "cronReport", void 0);
 ReportEntity = __decorate([
     (0, typeorm_1.Entity)()
 ], ReportEntity);

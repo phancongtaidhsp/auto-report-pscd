@@ -1,4 +1,5 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { CronReportEntity } from './cron-report.entity';
 import { UserEntity } from './user.entity';
 
 @Entity()
@@ -10,7 +11,7 @@ export class ReportEntity {
   project_name: string;
 
   @Column()
-  times_start: string;
+  time_start: string;
 
   @Column()
   working_time: string;
@@ -29,4 +30,7 @@ export class ReportEntity {
 
   @ManyToOne(() => UserEntity, (user) => user.id)
   user: number;
+
+  @OneToMany(() => CronReportEntity, (user) => user.id)
+  cronReport: CronReportEntity;
 }
