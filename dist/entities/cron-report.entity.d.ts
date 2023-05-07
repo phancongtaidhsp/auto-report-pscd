@@ -3,6 +3,6 @@ export declare class CronReportEntity {
     id: number;
     type: CronType;
     active: boolean;
-    dayofweeks: string;
+    dayofweek: string;
     report: number;
 }

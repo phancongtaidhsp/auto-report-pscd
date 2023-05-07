@@ -5,5 +5,6 @@ import { ReportModel } from 'src/models/report.model';
 export declare class CronReportController {
     private readonly cronReportService;
     constructor(cronReportService: CronReportService);
-    createCronReport(user: UserModel, cronReport: CronReportModel, report: ReportModel): Promise<any>;
+    createCronReport(user: UserModel, cronReport: CronReportModel, report: ReportModel): Promise<void>;
+    updateCronReport(user: UserModel, cronReport?: CronReportModel, report?: ReportModel): Promise<void>;
 }

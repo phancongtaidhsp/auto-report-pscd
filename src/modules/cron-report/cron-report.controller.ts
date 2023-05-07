@@ -1,4 +1,4 @@
-import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, HttpCode, UseGuards, HttpException } from '@nestjs/common';
 import { CronReportService } from './cron-report.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { AuthUser } from 'src/decorators/user.decorator';
@@ -17,8 +17,25 @@ export class CronReportController {
     @AuthUser() user: UserModel,
     @Body("cron_report") cronReport: CronReportModel,
     @Body("report") report: ReportModel,
-  ): Promise<any> {
-    return this.cronReportService.createCronReport(user.id, cronReport, report)
+  ): Promise<void> {
+    const isCreated = await this.cronReportService.createCronReport(user.id, cronReport, report)
+    if(!isCreated)  {
+      throw new HttpException('Bad request', HttpStatus.BAD_REQUEST)
+    }
+  }
+
+  @UseGuards(AuthGuard)
+  @Post('update')
+  @HttpCode(HttpStatus.OK)
+  async updateCronReport(
+    @AuthUser() user: UserModel,
+    @Body("cron_report") cronReport?: CronReportModel,
+    @Body("report") report?: ReportModel,
+  ): Promise<void> {
+    const isUpdated = await this.cronReportService.updateCronReport(user.id, cronReport, report)
+    if(!isUpdated)  {
+      throw new HttpException('Bad request', HttpStatus.BAD_REQUEST)
+    }
   }
 
 }

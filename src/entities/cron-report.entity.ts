@@ -14,7 +14,7 @@ export class CronReportEntity {
   active: boolean;
 
   @Column({ nullable: true })
-  dayofweeks: string;
+  dayofweek: string;
 
   @ManyToOne(() => ReportEntity, (report) => report.id)
   report: number;

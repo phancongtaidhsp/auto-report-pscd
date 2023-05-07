@@ -23,6 +23,7 @@ const cron_1 = require("cron");
 const puppeteer_1 = require("puppeteer");
 const auth_service_1 = require("../auth/auth.service");
 const user_entity_1 = require("../../entities/user.entity");
+const time_helper_1 = require("../../helper/time.helper");
 let CronReportService = class CronReportService {
     constructor(cronReportRepository, reportRepository, userRepository, authService) {
         this.cronReportRepository = cronReportRepository;
@@ -30,6 +31,33 @@ let CronReportService = class CronReportService {
         this.userRepository = userRepository;
         this.authService = authService;
         this.cronReportList = [];
+        this.runCron = (cron) => {
+            if (cron) {
+                let range = null;
+                const { time_end } = cron.report;
+                const [hour, minute] = (0, time_helper_1.timeToMinuteHour)(time_end);
+                if (cron.type === cron_report_model_1.CronType.WEEKLY) {
+                    range = `${minute} ${hour} * * ${cron.dayofweek}`;
+                }
+                else {
+                    range = `${minute} ${hour} * * 1,2,3,4,5`;
+                }
+                const cronIndex = this.cronReportList.findIndex((c) => c.id === cron.id);
+                if (cronIndex >= 0) {
+                    this.cronReportList[cronIndex].job.stop();
+                    this.cronReportList = [...this.cronReportList.slice(0, cronIndex), ...this.cronReportList.slice(cronIndex + 1)];
+                }
+                const job = new cron_1.CronJob(range, () => {
+                    console.log(`cron with id: ${cron.id} is running`);
+                    this.createReportPuppeteer(cron.id);
+                }, null, true, "Asia/Ho_Chi_Minh");
+                job.start();
+                this.cronReportList.push({
+                    id: cron.id,
+                    job
+                });
+            }
+        };
     }
     async onModuleInit() {
         const crons = await this.cronReportRepository.find({
@@ -39,22 +67,19 @@ let CronReportService = class CronReportService {
             relations: ['report', 'report.user']
         });
         for (const c of crons) {
-            console.log("wooo");
-            console.log(c);
-            let range = null;
-            const { time_end } = c.report;
-            const [hour, minute] = time_end.split(":");
-            if (c.type === cron_report_model_1.CronType.WEEKLY) {
-                range = `${minute} ${hour} * * ${c.dayofweek}`;
-            }
-            else {
-                range = `${minute} ${hour} * * *`;
-            }
-            console.log(range);
+            this.runCron(c);
         }
     }
-    async createReportPuppeteer(user, report) {
-        const { project_name, time_start, working_time, time_end, job, status, note } = report;
+    async createReportPuppeteer(cronReportId) {
+        const cron = await this.cronReportRepository.findOne({
+            where: {
+                id: cronReportId,
+                active: true
+            },
+            relations: ['report', 'report.user']
+        });
+        const { project_name, time_start, working_time, time_end, job, status, note } = cron.report;
+        const user = cron.report.user;
         const browser = await puppeteer_1.default.launch({
             headless: true,
             ignoreHTTPSErrors: true,
@@ -106,57 +131,102 @@ let CronReportService = class CronReportService {
         await page.waitForTimeout(800);
     }
     async createCronReport(userId, cronReport, report) {
-        const reportCreated = await this.reportRepository.save(Object.assign(Object.assign({}, report), { user: userId }));
-        const cronReportCreated = await this.cronReportRepository.save(Object.assign(Object.assign({}, cronReport), { report: reportCreated.id }));
-        const cron = await this.cronReportRepository.findOne({
-            where: {
-                active: true,
-                id: cronReportCreated.id
-            },
-            relations: ['report', 'report.user']
-        });
-        console.log("thit");
-        console.log(cron);
-        if (cron) {
-            let range = null;
-            const { time_end } = report;
-            const [hour, minute] = time_end.split(":");
-            if (cron.type === cron_report_model_1.CronType.WEEKLY) {
-                range = `${minute} ${hour} * * ${cron.dayofweek}`;
-            }
-            else {
-                range = `${minute} ${hour} * * *`;
-            }
-            console.log(range);
-            const job = new cron_1.CronJob(range, () => {
-                console.log(`cron with id: ${cron.id} is running`);
-                this.createReportPuppeteer(cron.report.user, cron.report);
-            }, null, true, "Asia/Singapore");
-            job.start();
-            this.cronReportList.push({
-                id: cron.id,
-                job
+        const canCreate = await this.canCreateOrUpdateCronReport(userId, cronReport);
+        if (canCreate) {
+            const reportCreated = await this.reportRepository.save(Object.assign(Object.assign({}, report), { user: userId }));
+            const cronReportCreated = await this.cronReportRepository.save(Object.assign(Object.assign({}, cronReport), { report: reportCreated.id }));
+            const cron = await this.cronReportRepository.findOne({
+                where: {
+                    active: true,
+                    id: cronReportCreated.id
+                },
+                relations: ['report', 'report.user']
             });
+            this.runCron(cron);
+            return true;
         }
+        return false;
     }
-    async canCreateCronReport(userId) {
-        const userReport = await this.userRepository.find({
-            where: {
-                id: userId
-            },
-            relations: ['reports']
-        });
-        console.log("cang");
-        console.log(userReport);
+    async updateCronReport(userId, cronReport, report) {
+        const canUpdate = await this.canCreateOrUpdateCronReport(userId, cronReport);
+        if (canUpdate) {
+            if (cronReport === null || cronReport === void 0 ? void 0 : cronReport.id) {
+                await this.cronReportRepository.update(cronReport.id, Object.assign(Object.assign(Object.assign({}, (cronReport.active !== undefined && { active: cronReport.active })), (cronReport.type !== undefined && { type: cronReport.type })), (cronReport.dayofweek !== undefined && { dayofweek: cronReport.dayofweek })));
+            }
+            if (report === null || report === void 0 ? void 0 : report.id) {
+                await this.reportRepository.update(report.id, Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign(Object.assign({}, (report.project_name !== undefined && { project_name: report.project_name })), (report.time_start !== undefined && { time_start: report.time_start })), (report.working_time !== undefined && { working_time: report.working_time })), (report.time_end !== undefined && { time_end: report.time_end })), (report.status !== undefined && { status: report.status })), (report.job !== undefined && { job: report.job })), (report.note !== undefined && { note: report.note })));
+            }
+            if (cronReport === null || cronReport === void 0 ? void 0 : cronReport.id) {
+                const cron = await this.cronReportRepository.findOne({
+                    where: {
+                        active: true,
+                        id: cronReport.id
+                    },
+                    relations: ['report', 'report.user']
+                });
+                this.runCron(cron);
+            }
+            if (!(cronReport === null || cronReport === void 0 ? void 0 : cronReport.id) && (report === null || report === void 0 ? void 0 : report.id)) {
+                const reportFound = await this.reportRepository.findOne({
+                    where: {
+                        id: report.id
+                    },
+                    relations: ['cronReports']
+                });
+                if (reportFound === null || reportFound === void 0 ? void 0 : reportFound.cronReports) {
+                    for (const r of reportFound.cronReports) {
+                        const crons = await this.cronReportRepository.find({
+                            where: {
+                                active: true,
+                                id: r.id
+                            },
+                            relations: ['report', 'report.user']
+                        });
+                        for (const cron of crons) {
+                            this.runCron(cron);
+                        }
+                    }
+                }
+            }
+            return true;
+        }
+        return false;
     }
-    async deactiveCronRepor(cronReportId) {
-        const cron = this.cronReportList.find(c => c.id === cronReportId);
-        if (cron === null || cron === void 0 ? void 0 : cron.job) {
-            cron.job.stop();
-            return await this.cronReportRepository.update(cron.id, {
-                active: false
+    async canCreateOrUpdateCronReport(userId, cronReport) {
+        var _a;
+        if (cronReport) {
+            const userReport = await this.userRepository.findOne({
+                where: {
+                    id: userId
+                },
+                relations: ['reports.cronReports']
             });
+            let crons = [];
+            for (const report of userReport.reports) {
+                crons = [...crons, ...report.cronReports];
+            }
+            crons = crons.filter(c => c.active);
+            if (cronReport.id) {
+                crons = crons.filter(c => c.id !== cronReport.id);
+            }
+            if (cronReport.type === cron_report_model_1.CronType.DAILY && crons.length > 0) {
+                return false;
+            }
+            if (cronReport.type === cron_report_model_1.CronType.WEEKLY) {
+                const dayofweekArray = cronReport.dayofweek.split(",");
+                for (const cron of crons) {
+                    if (cron.type === cron_report_model_1.CronType.DAILY) {
+                        return false;
+                    }
+                    for (const day of dayofweekArray) {
+                        if (cron.dayofweek && ((_a = cron.dayofweek) === null || _a === void 0 ? void 0 : _a.includes(day))) {
+                            return false;
+                        }
+                    }
+                }
+            }
         }
+        return true;
     }
 };
 CronReportService = __decorate([

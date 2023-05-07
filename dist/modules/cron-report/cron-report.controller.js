@@ -25,7 +25,16 @@ let CronReportController = class CronReportController {
         this.cronReportService = cronReportService;
     }
     async createCronReport(user, cronReport, report) {
-        return this.cronReportService.createCronReport(user.id, cronReport, report);
+        const isCreated = await this.cronReportService.createCronReport(user.id, cronReport, report);
+        if (!isCreated) {
+            throw new common_1.HttpException('Bad request', common_1.HttpStatus.BAD_REQUEST);
+        }
+    }
+    async updateCronReport(user, cronReport, report) {
+        const isUpdated = await this.cronReportService.updateCronReport(user.id, cronReport, report);
+        if (!isUpdated) {
+            throw new common_1.HttpException('Bad request', common_1.HttpStatus.BAD_REQUEST);
+        }
     }
 };
 __decorate([
@@ -41,6 +50,19 @@ __decorate([
         report_model_1.ReportModel]),
     __metadata("design:returntype", Promise)
 ], CronReportController.prototype, "createCronReport", null);
+__decorate([
+    (0, common_1.UseGuards)(auth_guard_1.AuthGuard),
+    (0, common_1.Post)('update'),
+    (0, common_1.HttpCode)(common_1.HttpStatus.OK),
+    __param(0, (0, user_decorator_1.AuthUser)()),
+    __param(1, (0, common_1.Body)("cron_report")),
+    __param(2, (0, common_1.Body)("report")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [user_model_1.UserModel,
+        cron_report_model_1.CronReportModel,
+        report_model_1.ReportModel]),
+    __metadata("design:returntype", Promise)
+], CronReportController.prototype, "updateCronReport", null);
 CronReportController = __decorate([
     (0, common_1.Controller)('cron-report'),
     __metadata("design:paramtypes", [cron_report_service_1.CronReportService])

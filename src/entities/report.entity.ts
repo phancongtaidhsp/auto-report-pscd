@@ -31,6 +31,6 @@ export class ReportEntity {
   @ManyToOne(() => UserEntity, (user) => user.id)
   user: number;
 
-  @OneToMany(() => CronReportEntity, (user) => user.id)
-  cronReport: CronReportEntity;
+  @OneToMany(() => CronReportEntity, (cronReport) => cronReport.report)
+  cronReports: CronReportEntity[];
 }

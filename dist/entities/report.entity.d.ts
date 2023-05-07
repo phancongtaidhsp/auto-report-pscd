@@ -9,5 +9,5 @@ export declare class ReportEntity {
     status: string;
     note: string;
     user: number;
-    cronReport: CronReportEntity;
+    cronReports: CronReportEntity[];
 }

@@ -30,7 +30,7 @@ __decorate([
 __decorate([
     (0, typeorm_1.Column)({ nullable: true }),
     __metadata("design:type", String)
-], CronReportEntity.prototype, "dayofweeks", void 0);
+], CronReportEntity.prototype, "dayofweek", void 0);
 __decorate([
     (0, typeorm_1.ManyToOne)(() => report_entity_1.ReportEntity, (report) => report.id),
     __metadata("design:type", Number)

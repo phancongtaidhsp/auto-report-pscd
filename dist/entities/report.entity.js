@@ -52,9 +52,9 @@ __decorate([
     __metadata("design:type", Number)
 ], ReportEntity.prototype, "user", void 0);
 __decorate([
-    (0, typeorm_1.OneToMany)(() => cron_report_entity_1.CronReportEntity, (user) => user.id),
-    __metadata("design:type", cron_report_entity_1.CronReportEntity)
-], ReportEntity.prototype, "cronReport", void 0);
+    (0, typeorm_1.OneToMany)(() => cron_report_entity_1.CronReportEntity, (cronReport) => cronReport.report),
+    __metadata("design:type", Array)
+], ReportEntity.prototype, "cronReports", void 0);
 ReportEntity = __decorate([
     (0, typeorm_1.Entity)()
 ], ReportEntity);
