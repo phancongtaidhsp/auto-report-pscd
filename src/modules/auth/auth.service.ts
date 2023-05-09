@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import puppeteer, { Page } from 'puppeteer';
+import { Page } from 'puppeteer';
 import { UserEntity } from 'src/entities/user.entity';
 import { UserModel } from 'src/models/user.model';
 import { Repository } from 'typeorm';

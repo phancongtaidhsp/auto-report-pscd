@@ -19,7 +19,6 @@ export class AuthController {
         access_token = loginRes.access_token
       } else {
         const browser = await puppeteer.launch({
-          headless: true,
           ignoreHTTPSErrors: true,
           ignoreDefaultArgs: ['--enable-automation'],
           args: [

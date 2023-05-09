@@ -29,7 +29,6 @@ let AuthController = class AuthController {
             }
             else {
                 const browser = await puppeteer_1.default.launch({
-                    headless: true,
                     ignoreHTTPSErrors: true,
                     ignoreDefaultArgs: ['--enable-automation'],
                     args: [
