@@ -29,19 +29,7 @@ let AuthController = class AuthController {
             }
             else {
                 console.log("run");
-                const browser = await puppeteer_1.default.launch({
-                    ignoreHTTPSErrors: true,
-                    ignoreDefaultArgs: ['--enable-automation'],
-                    args: [
-                        `--window-size=1280,1024`,
-                        '--no-sandbox',
-                        '--disable-setuid-sandbox',
-                        '--disable-infobars',
-                        '--ignore-certifcate-errors',
-                        '--ignore-certifcate-errors-spki-list',
-                        '--user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3312.0 Safari/537.36"',
-                    ],
-                });
+                const browser = await puppeteer_1.default.launch();
                 console.log("run1");
                 const page = await browser.newPage();
                 console.log("run2");
