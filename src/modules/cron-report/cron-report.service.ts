@@ -48,6 +48,7 @@ export class CronReportService implements OnModuleInit {
     const { project_name, time_start, working_time, time_end, job, status, note } = cron.report
     const user = cron.report.user
     const browser = await puppeteer.launch({
+      headless: "new",
       ignoreHTTPSErrors: true,
       ignoreDefaultArgs: ['--enable-automation'],
       args: [
