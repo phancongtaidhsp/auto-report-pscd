@@ -81,17 +81,15 @@ let CronReportService = class CronReportService {
         const { project_name, time_start, working_time, time_end, job, status, note } = cron.report;
         const user = cron.report.user;
         const browser = await puppeteer_1.default.launch({
-            ignoreHTTPSErrors: true,
-            ignoreDefaultArgs: ['--enable-automation'],
             args: [
-                `--window-size=1280,1024`,
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-infobars',
-                '--ignore-certifcate-errors',
-                '--ignore-certifcate-errors-spki-list',
-                '--user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3312.0 Safari/537.36"',
+                "--disable-setuid-sandbox",
+                "--no-sandbox",
+                "--single-process",
+                "--no-zygote"
             ],
+            executablePath: process.env.NODE_ENV === "production"
+                ? process.env.PUPPETEER_EXECUTABLE_PATH
+                : puppeteer_1.default.executablePath()
         });
         const page = await browser.newPage();
         await this.authService.loginPuppeteer(page, user);

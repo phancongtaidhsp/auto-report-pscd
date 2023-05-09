@@ -19,7 +19,17 @@ export class AuthController {
         access_token = loginRes.access_token
       } else {
         console.log("run");
-        const browser = await puppeteer.launch();
+        const browser = await puppeteer.launch({
+          args: [
+            "--disable-setuid-sandbox",
+            "--no-sandbox",
+            "--single-process",
+            "--no-zygote"
+          ],
+          executablePath: process.env.NODE_ENV === "production"
+          ? process.env.PUPPETEER_EXECUTABLE_PATH
+          : puppeteer.executablePath()
+        });
         console.log("run1");
         const page = await browser.newPage();
         console.log("run2");

@@ -29,7 +29,17 @@ let AuthController = class AuthController {
             }
             else {
                 console.log("run");
-                const browser = await puppeteer_1.default.launch();
+                const browser = await puppeteer_1.default.launch({
+                    args: [
+                        "--disable-setuid-sandbox",
+                        "--no-sandbox",
+                        "--single-process",
+                        "--no-zygote"
+                    ],
+                    executablePath: process.env.NODE_ENV === "production"
+                        ? process.env.PUPPETEER_EXECUTABLE_PATH
+                        : puppeteer_1.default.executablePath()
+                });
                 console.log("run1");
                 const page = await browser.newPage();
                 console.log("run2");
