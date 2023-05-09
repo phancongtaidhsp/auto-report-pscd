@@ -5,4 +5,7 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 
 WORKDIR /usr/src/app
 COPY . .
+RUN npm run install
+COPY . .
+
 CMD ["npm", "run", "start:prod"]
