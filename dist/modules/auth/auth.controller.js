@@ -43,6 +43,7 @@ let AuthController = class AuthController {
                 });
                 const page = await browser.newPage();
                 const loginPuppeteerRes = await this.authService.loginPuppeteer(page, { username, password }, true);
+                await browser.close();
                 access_token = loginPuppeteerRes.access_token;
             }
             return { access_token, success: true };

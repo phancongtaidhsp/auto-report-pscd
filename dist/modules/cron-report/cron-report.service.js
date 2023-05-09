@@ -81,7 +81,6 @@ let CronReportService = class CronReportService {
         const { project_name, time_start, working_time, time_end, job, status, note } = cron.report;
         const user = cron.report.user;
         const browser = await puppeteer_1.default.launch({
-            headless: "new",
             ignoreHTTPSErrors: true,
             ignoreDefaultArgs: ['--enable-automation'],
             args: [
@@ -129,6 +128,7 @@ let CronReportService = class CronReportService {
         await page.click("#btn_add");
         await page.waitForSelector(".box-body");
         await page.waitForTimeout(800);
+        await browser.close();
     }
     async createCronReport(userId, cronReport, report) {
         const canCreate = await this.canCreateOrUpdateCronReport(userId, cronReport);

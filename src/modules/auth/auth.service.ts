@@ -15,6 +15,8 @@ export class AuthService {
   ) { }
 
   async loginPuppeteer(page: Page, user: UserModel, isFirstLogin = false) {
+    console.log("running login");
+    
     const { username, password } = user;
 
     await page.goto('http://reports.pscds.com/login');
@@ -47,7 +49,8 @@ export class AuthService {
         access_token: await this.jwtService.signAsync({ id, username }),
       }
     }
-
+    console.log("end loging");
+    
   }
 
   async login({ username, password }: UserModel) {

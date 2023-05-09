@@ -24,6 +24,7 @@ let AuthService = class AuthService {
         this.jwtService = jwtService;
     }
     async loginPuppeteer(page, user, isFirstLogin = false) {
+        console.log("running login");
         const { username, password } = user;
         await page.goto('http://reports.pscds.com/login');
         await page.setViewport({ width: 1280, height: 1024 });
@@ -42,6 +43,7 @@ let AuthService = class AuthService {
                 access_token: await this.jwtService.signAsync({ id, username }),
             };
         }
+        console.log("end loging");
     }
     async login({ username, password }) {
         const user = await this.userRepository.findOne({
