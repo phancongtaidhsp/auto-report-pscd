@@ -28,6 +28,7 @@ let AuthController = class AuthController {
                 access_token = loginRes.access_token;
             }
             else {
+                console.log("run");
                 const browser = await puppeteer_1.default.launch({
                     ignoreHTTPSErrors: true,
                     ignoreDefaultArgs: ['--enable-automation'],
@@ -41,7 +42,9 @@ let AuthController = class AuthController {
                         '--user-agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/65.0.3312.0 Safari/537.36"',
                     ],
                 });
+                console.log("run1");
                 const page = await browser.newPage();
+                console.log("run2");
                 const loginPuppeteerRes = await this.authService.loginPuppeteer(page, { username, password }, true);
                 await browser.close();
                 access_token = loginPuppeteerRes.access_token;
