@@ -1,3 +1,4 @@
+FROM node:16.5.0
 FROM ghcr.io/puppeteer/puppeteer:20.1.0
 
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
@@ -11,4 +12,4 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start:prod"]
+CMD ["node", "dist/main"]
