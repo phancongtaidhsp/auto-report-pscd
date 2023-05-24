@@ -5,11 +5,17 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
     PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
 WORKDIR /usr/src/app
+ENV NODE_ENV=production
 
 COPY package*.json ./
-RUN npm ci
-COPY . .
+
+RUN npm install -g @nestjs/cli@9.4.2
+
+RUN npm install
+COPY . ./
+
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
+CMD ["npm", "run", "start:prod"]
