@@ -7,12 +7,14 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
 WORKDIR /usr/src/app
 ENV NODE_ENV=production
 
+USER root
+
 COPY package*.json ./
 
 RUN npm install -g @nestjs/cli@9.4.2
 
 RUN npm install
-COPY . ./
+COPY . .
 
 RUN npm run build
 
