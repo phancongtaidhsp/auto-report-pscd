@@ -81,19 +81,14 @@ let CronReportService = class CronReportService {
         const { project_name, time_start, working_time, time_end, job, status, note } = cron.report;
         const user = cron.report.user;
         const browser = await puppeteer_1.default.launch({
-            args: [
-                "--disable-setuid-sandbox",
-                "--no-sandbox",
-                "--single-process",
-                "--no-zygote"
-            ],
+            headless: false,
             executablePath: process.env.NODE_ENV === "production"
                 ? process.env.PUPPETEER_EXECUTABLE_PATH
                 : puppeteer_1.default.executablePath()
         });
         const page = await browser.newPage();
         await this.authService.loginPuppeteer(page, user);
-        await page.goto('http://reports.pscds.com/reports/add');
+        await page.goto('http://reports.pscds.com/reports/add', { waitUntil: 'domcontentloaded' });
         await page.waitForSelector('#project_id');
         const projectValue = await page.evaluate((project_name) => {
             const projectOptionEls = Array.from(document.querySelectorAll("#project_id option"));

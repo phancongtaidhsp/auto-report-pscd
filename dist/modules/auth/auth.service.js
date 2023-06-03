@@ -26,7 +26,7 @@ let AuthService = class AuthService {
     async loginPuppeteer(page, user, isFirstLogin = false) {
         console.log("running login");
         const { username, password } = user;
-        await page.goto('http://reports.pscds.com/login');
+        await page.goto('http://reports.pscds.com/login', { waitUntil: 'domcontentloaded' });
         await page.setViewport({ width: 1280, height: 1024 });
         await page.waitForSelector('#email');
         await page.type('#email', username, { delay: 30 });

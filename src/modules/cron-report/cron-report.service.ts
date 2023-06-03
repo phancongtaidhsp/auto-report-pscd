@@ -48,19 +48,13 @@ export class CronReportService implements OnModuleInit {
     const { project_name, time_start, working_time, time_end, job, status, note } = cron.report
     const user = cron.report.user
     const browser = await puppeteer.launch({
-      args: [
-        "--disable-setuid-sandbox",
-        "--no-sandbox",
-        "--single-process",
-        "--no-zygote"
-      ],
       executablePath: process.env.NODE_ENV === "production"
         ? process.env.PUPPETEER_EXECUTABLE_PATH
         : puppeteer.executablePath()
     });
     const page = await browser.newPage();
     await this.authService.loginPuppeteer(page, user)
-    await page.goto('http://reports.pscds.com/reports/add')
+    await page.goto('http://reports.pscds.com/reports/add', { waitUntil: 'domcontentloaded' })
 
     await page.waitForSelector('#project_id')
 

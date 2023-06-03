@@ -19,7 +19,7 @@ export class AuthService {
     
     const { username, password } = user;
 
-    await page.goto('http://reports.pscds.com/login');
+    await page.goto('http://reports.pscds.com/login', { waitUntil: 'domcontentloaded' });
 
     // Set screen size
     await page.setViewport({ width: 1280, height: 1024 });
