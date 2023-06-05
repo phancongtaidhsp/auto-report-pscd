@@ -20,6 +20,7 @@ export class AuthController {
       } else {
         console.log("run");
         const browser = await puppeteer.launch({
+          args: ['--no-sandbox', '--disable-setuid-sandbox', '--single-process'],
           executablePath: process.env.NODE_ENV === "production"
           ? process.env.PUPPETEER_EXECUTABLE_PATH
           : puppeteer.executablePath()
