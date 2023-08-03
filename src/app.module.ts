@@ -18,7 +18,7 @@ import { JwtModule } from '@nestjs/jwt';
       database: process.env.DB_DATABASE,
       autoLoadEntities: true,
       synchronize: true,
-      ssl: true
+      ssl: false
     }),
     AuthModule,
     CronReportModule

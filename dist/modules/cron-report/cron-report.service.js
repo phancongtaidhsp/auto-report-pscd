@@ -81,7 +81,7 @@ let CronReportService = class CronReportService {
         const { project_name, time_start, working_time, time_end, job, status, note } = cron.report;
         const user = cron.report.user;
         const browser = await puppeteer_1.default.launch({
-            headless: false,
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--single-process'],
             executablePath: process.env.NODE_ENV === "production"
                 ? process.env.PUPPETEER_EXECUTABLE_PATH
                 : puppeteer_1.default.executablePath()

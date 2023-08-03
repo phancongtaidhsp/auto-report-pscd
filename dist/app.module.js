@@ -29,7 +29,7 @@ AppModule = __decorate([
                 database: process.env.DB_DATABASE,
                 autoLoadEntities: true,
                 synchronize: true,
-                ssl: true
+                ssl: false
             }),
             auth_module_1.AuthModule,
             cron_report_module_1.CronReportModule
